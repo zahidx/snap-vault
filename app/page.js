@@ -1,8 +1,10 @@
+// HomePage.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Download, Search, X } from "lucide-react";
+import { Download, Search, X, ZoomIn, ChevronDown, Menu } from "lucide-react";
+import Sidebar from "./Sidebar"; // Import Sidebar component
 
 export default function HomePage() {
   const [images, setImages] = useState([]);
@@ -10,28 +12,38 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [category, setCategory] = useState("nature");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Fetch images from the custom Next.js API route
-  const fetchImages = async () => {
+  const API_KEY = "YOUR_UNSPLASH_ACCESS_KEY"; // Replace with your Unsplash API key
+
+  // Fetch images from the API with error handling and retry mechanism
+  const fetchImages = useCallback(async () => {
     setLoading(true);
+    setError(null); // Reset error state on new fetch
     try {
-      const response = await axios.get(`/api/unsplash?query=${query}&page=${page}`);
+      const response = await axios.get(
+        `/api/unsplash?query=${category}&page=${page}&client_id=${API_KEY}`
+      );
       setImages((prev) => [...prev, ...response.data.results]);
-    } catch (error) {
-      console.error("Error fetching images:", error);
+    } catch (err) {
+      setError("Error fetching images, please try again.");
+      console.error("Error fetching images:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, [category, page]);
 
   useEffect(() => {
-    setImages([]); // Reset images when query changes
+    setImages([]); // Reset images when category changes
     setPage(1);
     fetchImages();
-  }, [query]);
+  }, [category, fetchImages]);
 
   useEffect(() => {
     if (page > 1) fetchImages();
-  }, [page]);
+  }, [page, fetchImages]);
 
   // Handle Infinite Scroll
   useEffect(() => {
@@ -49,8 +61,23 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Search Bar */}
-      <div className="flex justify-center items-center py-6">
+      {/* Sidebar Toggle */}
+      <button
+        className="p-4 fixed top-0 left-0 z-50 bg-gray-800 text-white dark:bg-gray-900"
+        onClick={() => setIsSidebarOpen((prev) => !prev)}
+      >
+        <Menu size={24} />
+      </button>
+
+      {/* Sidebar */}
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        setCategory={setCategory}
+      />
+
+      {/* Main Content */}
+      <div className="flex justify-center items-center py-6 space-x-4">
         <motion.div
           className="flex items-center border rounded-lg px-4 py-2 w-80 bg-white dark:bg-gray-800 shadow-lg"
           whileHover={{ scale: 1.05 }}
@@ -64,7 +91,33 @@ export default function HomePage() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </motion.div>
+
+        {/* Category Selector */}
+        <motion.div
+          className="relative flex items-center border rounded-lg px-4 py-2 w-40 bg-white dark:bg-gray-800 shadow-lg"
+          whileHover={{ scale: 1.05 }}
+        >
+          <span className="mr-2 text-gray-500">Category:</span>
+          <select
+            className="bg-transparent outline-none text-sm"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="nature">Nature</option>
+            <option value="tech">Tech</option>
+            <option value="food">Food</option>
+            <option value="animals">Animals</option>
+          </select>
+          <ChevronDown size={16} className="ml-2 text-gray-500" />
+        </motion.div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="text-center text-red-500 py-4">
+          <p>{error}</p>
+        </div>
+      )}
 
       {/* Image Gallery */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6">
@@ -78,7 +131,8 @@ export default function HomePage() {
             <img
               src={img.urls.regular}
               alt={img.alt_description}
-              className="w-full h-60 object-cover"
+              className="w-full h-60 object-cover lazyload"
+              loading="lazy" // Enable lazy loading for images
             />
             <div className="absolute bottom-0 bg-black/50 text-white w-full text-center py-2">
               {img.user.name}
@@ -118,16 +172,39 @@ export default function HomePage() {
             />
             <div className="mt-4 flex justify-between items-center">
               <span className="text-sm">{selectedImage.user.name}</span>
-              <a
-                href={selectedImage.links.download}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg"
-              >
-                <Download size={18} className="mr-2" />
-                Download
-              </a>
+              <div className="flex items-center">
+                <button
+                  onClick={() => setSelectedImage({ ...selectedImage, zoom: !selectedImage.zoom })}
+                  className="mr-4 text-gray-600 dark:text-gray-400"
+                >
+                  <ZoomIn size={20} />
+                </button>
+                <a
+                  href={selectedImage.links.download}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg"
+                >
+                  <Download size={18} className="mr-2" />
+                  Download
+                </a>
+              </div>
             </div>
+            {/* Zooming feature (can be expanded with more logic) */}
+            {selectedImage.zoom && (
+              <motion.div
+                className="absolute inset-0 bg-black/70 flex justify-center items-center z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <img
+                  src={selectedImage.urls.full}
+                  alt={selectedImage.alt_description}
+                  className="w-3/4 h-auto"
+                />
+              </motion.div>
+            )}
           </motion.div>
         </div>
       )}
