@@ -28,7 +28,7 @@ export default function Navbar() {
   return (
     <nav
       className={`fixed top-0 w-full z-50 backdrop-blur-lg bg-opacity-80 transition-all duration-300 ${
-        darkMode ? "bg-gray-900 text-white" : "bg-white text-gray-900 shadow-lg"
+        darkMode ? "bg-gray-900 text-white" : "bg-gray-900 text-gray-900 shadow-lg"
       }`}
     >
       {/* Desktop Navbar */}

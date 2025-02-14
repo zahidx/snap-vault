@@ -15,40 +15,40 @@ export default function DesktopNavbar({
   categoryRef,
 }) {
   return (
-    <div className="hidden md:flex max-w-7xl mx-auto px-6 py-4 justify-between items-center">
+    <div className="hidden md:flex max-w-7xl mx-auto px-6 py-4 justify-between items-center bg-gray-900 text-white">
       {/* Logo */}
       <motion.h1
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-extrabold tracking-tight cursor-pointer"
+        className="text-4xl font-extrabold cursor-pointer text-gray-100"
       >
         PhotoGallery
       </motion.h1>
 
       {/* Search Bar */}
       <motion.div
-        className="hidden md:flex items-center bg-white dark:bg-gray-800 border rounded-xl px-3 py-2 w-80 shadow-md transition-all duration-300"
+        className="hidden md:flex items-center bg-gray-800 border rounded-xl px-4 py-2 w-80 shadow-lg transition-all duration-300"
         whileHover={{ scale: 1.05 }}
       >
-        <Search size={18} className="text-gray-400 mr-2" />
+        <Search size={20} className="text-gray-400 mr-2" />
         <input
           type="text"
           placeholder="Search images..."
-          className="w-full bg-transparent outline-none text-sm dark:text-white"
+          className="w-full bg-transparent outline-none text-sm text-gray-300"
         />
       </motion.div>
 
       {/* Right Section */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-8">
         {/* Categories Dropdown */}
         <div className="relative" ref={categoryRef}>
           <button
             onClick={toggleCategories}
-            className="flex items-center space-x-2 px-4 py-2 border rounded-lg transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-800"
+            className="flex items-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 transition-all duration-200 hover:bg-gray-700"
           >
-            <Grid size={18} className="text-gray-400" />
+            <Grid size={20} className="text-gray-400" />
             <span>Categories</span>
-            <ChevronDown size={18} />
+            <ChevronDown size={20} />
           </button>
           <AnimatePresence>
             {categoriesOpen && (
@@ -56,7 +56,7 @@ export default function DesktopNavbar({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 border rounded-lg shadow-lg overflow-hidden"
+                className="absolute right-0 mt-2 w-52 bg-gray-800 border rounded-lg shadow-lg overflow-hidden"
               >
                 {[
                   { name: "Nature", emoji: "🌿", path: "/nature" },
@@ -68,9 +68,9 @@ export default function DesktopNavbar({
                   <motion.li
                     key={index}
                     whileHover={{ scale: 1.05 }}
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all"
+                    className="hover:bg-gray-700 cursor-pointer transition-all"
                   >
-                    <Link href={category.path} className="flex px-4 py-2">
+                    <Link href={category.path} className="flex px-4 py-2 text-gray-300">
                       {category.emoji} {category.name}
                     </Link>
                   </motion.li>
@@ -84,11 +84,11 @@ export default function DesktopNavbar({
         <div className="relative">
           <button
             onClick={toggleSettings}
-            className="flex items-center space-x-2 px-4 py-2 border rounded-lg transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-800"
+            className="flex items-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 transition-all duration-200 hover:bg-gray-700"
           >
-            <Settings size={18} className="text-gray-400" />
+            <Settings size={20} className="text-gray-400" />
             <span>Settings</span>
-            <ChevronDown size={18} />
+            <ChevronDown size={20} />
           </button>
           <AnimatePresence>
             {settingsOpen && (
@@ -96,19 +96,17 @@ export default function DesktopNavbar({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 border rounded-lg shadow-lg overflow-hidden"
+                className="absolute right-0 mt-2 w-52 bg-gray-800 border rounded-lg shadow-lg overflow-hidden"
               >
-                {["Account", "Privacy", "Notifications", "General"].map(
-                  (setting, index) => (
-                    <motion.li
-                      key={index}
-                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      {setting}
-                    </motion.li>
-                  )
-                )}
+                {["Account", "Privacy", "Notifications", "General"].map((setting, index) => (
+                  <motion.li
+                    key={index}
+                    className="px-4 py-2 hover:bg-gray-700 cursor-pointer transition-all"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    {setting}
+                  </motion.li>
+                ))}
               </motion.ul>
             )}
           </AnimatePresence>
@@ -117,18 +115,18 @@ export default function DesktopNavbar({
         {/* Dark Mode Toggle */}
         <motion.button
           onClick={toggleDarkMode}
-          className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+          className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-700"
           whileTap={{ scale: 0.9 }}
         >
-          {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          {darkMode ? <Sun size={22} className="text-yellow-500" /> : <Moon size={22} className="text-gray-400" />}
         </motion.button>
 
         {/* Profile / Login */}
         <motion.button
-          className="flex items-center space-x-2 px-4 py-2 border rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+          className="flex items-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 hover:bg-gray-700 transition-all duration-200"
           whileHover={{ scale: 1.05 }}
         >
-          <User size={18} />
+          <User size={20} />
           <span>Sign In</span>
         </motion.button>
       </div>
