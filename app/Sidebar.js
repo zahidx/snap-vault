@@ -59,7 +59,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen, setCategory }) => {
         <div className="relative">
           <input
             type="text"
-            className="w-40 py-2 px-4 text-sm rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="w-40 py-2 px-4 text-sm  rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
             placeholder="Search Categories"
             value={searchQuery}
             onChange={handleSearchChange}
