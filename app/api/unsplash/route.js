@@ -1,26 +1,32 @@
 import { NextResponse } from "next/server";
 
 export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const query = searchParams.get("query") || "nature";  // Default to "nature" if no query is provided
-  const totalPages = 4;  // Specify how many pages you want to fetch, adjust based on your needs
-  
-  let allImages = [];
-  
-  // Fetch images for multiple pages
-  for (let page = 1; page <= totalPages; page++) {
-    const response = await fetch(
-      `https://api.unsplash.com/search/photos?page=${page}&query=${query}&client_id=${process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY}&per_page=12`
-    );
+  try {
+    const { searchParams } = new URL(req.url);
+    const query = searchParams.get("query") || "nature"; // Default to "nature" if no query
+    const totalPages = 4;
+    const perPage = 12;
+    const accessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
-    if (!response.ok) {
-      return NextResponse.json({ error: "Failed to fetch images" }, { status: 500 });
+    if (!accessKey) {
+      return NextResponse.json({ error: "Unsplash API key is missing" }, { status: 500 });
     }
 
-    const data = await response.json();
-    allImages = [...allImages, ...data.results]; // Combine images from each page
-  }
+    // Fetch all pages in parallel using Promise.all
+    const fetchPromises = Array.from({ length: totalPages }, (_, i) =>
+      fetch(
+        `https://api.unsplash.com/search/photos?page=${i + 1}&query=${encodeURIComponent(query)}&client_id=${accessKey}&per_page=${perPage}`
+      ).then((res) => res.json())
+    );
 
-  // Return the combined image data as a JSON response
-  return NextResponse.json({ results: allImages });
+    const responses = await Promise.all(fetchPromises);
+
+    // Combine images from all pages
+    const allImages = responses.flatMap((data) => data.results || []);
+
+    return NextResponse.json({ results: allImages });
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

@@ -1,4 +1,6 @@
 "use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, Sun, Moon, User, Grid, Settings } from "lucide-react";
@@ -14,6 +16,30 @@ export default function DesktopNavbar({
   toggleAccount,
   categoryRef,
 }) {
+  const router = useRouter(); // Initialize router
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim() !== "") {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`); // Navigate with search query
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery(""); // Clear search input
+    router.push("/"); // Navigate to the homepage when search is cleared
+  };
+
+  // Update URL based on the search query change
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      router.push("/"); // Redirect to home page if search query is empty
+    } else {
+      router.push(`/search?query=${encodeURIComponent(searchQuery)}`); // Navigate to search results if query exists
+    }
+  }, [searchQuery, router]);
+
   return (
     <div className="hidden md:flex max-w-7xl mx-auto px-6 py-4 justify-between items-center bg-gray-900 text-white">
       {/* Logo */}
@@ -26,7 +52,8 @@ export default function DesktopNavbar({
       </motion.h1>
 
       {/* Search Bar */}
-      <motion.div
+      <motion.form
+        onSubmit={handleSearch} // Handle search submission
         className="hidden md:flex items-center bg-gray-800 border rounded-xl px-4 py-2 w-80 shadow-lg transition-all duration-300"
         whileHover={{ scale: 1.05 }}
       >
@@ -34,9 +61,21 @@ export default function DesktopNavbar({
         <input
           type="text"
           placeholder="Search images..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} // Update state
           className="w-full bg-transparent outline-none text-sm text-gray-300"
         />
-      </motion.div>
+        {searchQuery && (
+  <button
+    type="button"
+    onClick={clearSearch} // Clear search on button click
+    className="ml-2 text-2xl text-gray-400 hover:text-gray-200"
+  >
+    ✕
+  </button>
+)}
+
+      </motion.form>
 
       {/* Right Section */}
       <div className="flex items-center space-x-8">
