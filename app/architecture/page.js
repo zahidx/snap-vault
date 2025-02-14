@@ -2,63 +2,58 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Download, Search, X, ZoomIn } from "lucide-react";
+import { Download, ZoomIn } from "lucide-react";
 import ImageModal from "../ImageModal";
+import AOS from "aos";
+import "aos/dist/aos.css"; // Don't forget to import AOS CSS
 
 export default function ArchitecturePage() {
   const [images, setImages] = useState([]);
-  const [query, setQuery] = useState("architecture");
-  const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_KEY = "YOUR_UNSPLASH_ACCESS_KEY";
+  const API_KEY = "YOUR_UNSPLASH_ACCESS_KEY"; // Replace with your Unsplash API key
 
   const fetchImages = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get(
-        `/api/unsplash?query=architecture&page=${page}&client_id=${API_KEY}`
+        `/api/unsplash?query=architecture&page=1&client_id=${API_KEY}`
       );
-      setImages((prev) => [...prev, ...response.data.results]);
+      setImages(response.data.results); // Fetch all images once
     } catch (err) {
       setError("Error fetching images, please try again.");
       console.error("Error fetching images:", err);
     } finally {
       setLoading(false);
     }
-  }, [page]);
-
-  useEffect(() => {
-    setImages([]);
-    setPage(1);
-    fetchImages();
-  }, [fetchImages]);
-
-  useEffect(() => {
-    if (page > 1) fetchImages();
-  }, [page, fetchImages]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 50
-      ) {
-        setPage((prev) => prev + 1);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchImages(); // Fetch all images when the component mounts
+    AOS.init({
+      duration: 1200,  // Increasing the duration for smoother animation
+      easing: "ease-out-cubic",  // Using a smoother easing function
+      once: false,  // Allow animations to repeat every time they come into view
+    });
+    window.addEventListener("scroll", AOS.refresh); // Refresh AOS on scroll
+    return () => {
+      window.removeEventListener("scroll", AOS.refresh); // Clean up the event listener
+    };
+  }, [fetchImages]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
       {/* Hero Section */}
-      <div className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center bg-fixed text-white text-3xl font-bold tracking-wide" 
-        style={{ backgroundImage: "url('/path-to-hero-image.jpg')" }}>
+      <div
+        className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center bg-fixed text-white text-3xl font-bold tracking-wide"
+        style={{ backgroundImage: "url('/path-to-hero-image.jpg')" }}
+        data-aos="fade-up"
+        data-aos-duration="1500"
+        data-aos-easing="ease-out-cubic" // Added a smoother easing function
+      >
         Architectural Wonders
       </div>
 
@@ -70,6 +65,10 @@ export default function ArchitecturePage() {
             className="relative mb-4 overflow-hidden rounded-lg shadow-lg cursor-pointer group"
             whileHover={{ scale: 1.03 }}
             onClick={() => setSelectedImage(img)}
+            data-aos="zoom-in"
+            data-aos-duration="1200"  // Increased duration for smoother effect
+            data-aos-delay="200"
+            data-aos-easing="ease-out-cubic" // Added a smoother easing function
           >
             <img
               src={img.urls.regular}

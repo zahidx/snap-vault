@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { UserPlus, Eye } from "lucide-react";
+import AOS from "aos";
+import "aos/dist/aos.css"; // Make sure AOS styles are imported
 
 export default function PeoplePage() {
   const [people, setPeople] = useState([]);
@@ -24,6 +26,15 @@ export default function PeoplePage() {
 
   useEffect(() => {
     fetchPeople();
+    AOS.init({
+      duration: 1500, // Smooth transition duration
+      easing: "ease-out-quint", // A smooth ease-out effect
+      once: false, // Make sure the animation happens every time
+    });
+    window.addEventListener("scroll", AOS.refresh); // Refresh AOS when scrolling
+    return () => {
+      window.removeEventListener("scroll", AOS.refresh); // Cleanup on unmount
+    };
   }, []);
 
   // Navigate to ProfilePage
@@ -44,8 +55,12 @@ export default function PeoplePage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Hero Section */}
-      <div className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center text-white text-4xl font-bold tracking-wide" 
-        style={{ backgroundImage: "url('/path-to-people-banner.jpg')" }}>
+      <div className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center text-white text-4xl font-bold tracking-wide"
+        style={{ backgroundImage: "url('/path-to-people-banner.jpg')" }}
+        data-aos="fade-down"
+        data-aos-duration="1500"
+        data-aos-easing="ease-out-cubic"
+      >
         Meet Our Community
       </div>
 
@@ -55,6 +70,10 @@ export default function PeoplePage() {
           <motion.div
             key={index}
             className="relative bg-gray-800 rounded-xl shadow-lg overflow-hidden p-4 text-center transform hover:scale-105 transition-transform duration-300"
+            data-aos="zoom-in"
+            data-aos-duration="1500"
+            data-aos-delay={index * 100} // Delay each card by a bit for staggered animation
+            data-aos-easing="ease-out-quint"
           >
             <img
               src={person.picture.large}
@@ -75,7 +94,7 @@ export default function PeoplePage() {
                 }`}
                 onClick={() => handleFollow(person.login.uuid)}
               >
-                <UserPlus size={16} /> 
+                <UserPlus size={16} />
                 {followed[person.login.uuid] ? "Following" : "Follow"}
               </motion.button>
               <motion.button

@@ -1,14 +1,16 @@
 "use client";
+
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Download, Search, ZoomIn } from "lucide-react";
 import ImageModal from "../ImageModal";
+import AOS from "aos"; // Import AOS
+import "aos/dist/aos.css"; // Import AOS styles
 
 export default function TechnologyPage() {
   const [images, setImages] = useState([]);
   const [query, setQuery] = useState("technology");
-  const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -20,49 +22,37 @@ export default function TechnologyPage() {
     setError(null);
     try {
       const response = await axios.get(
-        `/api/unsplash?query=technology&page=${page}&client_id=${API_KEY}`
+        `/api/unsplash?query=technology&page=1&client_id=${API_KEY}`
       );
-      setImages((prev) => [...prev, ...response.data.results]);
+      setImages(response.data.results); // Fetch all images once
     } catch (err) {
       setError("Error fetching images, please try again.");
       console.error("Error fetching images:", err);
     } finally {
       setLoading(false);
     }
-  }, [page]);
-
-  useEffect(() => {
-    setImages([]);
-    setPage(1);
-    fetchImages();
-  }, [fetchImages]);
-
-  useEffect(() => {
-    if (page > 1) fetchImages();
-  }, [page, fetchImages]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop >=
-        document.documentElement.offsetHeight - 50
-      ) {
-        setPage((prev) => prev + 1);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    fetchImages(); // Fetch all images when the component mounts
+
+    AOS.init({ // Initialize AOS
+      duration: 1200,
+      easing: 'ease-in-out',
+      once: true, // Trigger animation only once
+    });
+  }, [fetchImages]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Hero Section */}
-      <div className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center bg-fixed text-white text-3xl font-bold tracking-wide" 
-        style={{ backgroundImage: "url('/path-to-hero-image.jpg')" }}>
+      <div 
+        className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center bg-fixed text-white text-3xl font-bold tracking-wide" 
+        style={{ backgroundImage: "url('/path-to-hero-image.jpg')" }}
+        data-aos="fade-up"
+      >
         Future of Technology
       </div>
-
-      
 
       {/* Grid for Images */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
@@ -71,6 +61,8 @@ export default function TechnologyPage() {
             key={img.id}
             className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer bg-gray-800 group transform hover:scale-105 transition-transform duration-300"
             onClick={() => setSelectedImage(img)}
+            data-aos="fade-up"
+            data-aos-delay="200"
           >
             <img
               src={img.urls.regular}
@@ -94,7 +86,7 @@ export default function TechnologyPage() {
 
       {/* Loading Indicator */}
       {loading && (
-        <div className="text-center py-6">
+        <div className="text-center py-6" data-aos="fade-up">
           <motion.div
             className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"
           />
@@ -106,6 +98,7 @@ export default function TechnologyPage() {
         <ImageModal
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}
+          data-aos="fade-up"
         />
       )}
     </div>

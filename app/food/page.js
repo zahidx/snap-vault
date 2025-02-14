@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Search, Heart, Eye } from "lucide-react";
+import { Heart, Eye } from "lucide-react";
 import { useRouter } from "next/navigation";
+import AOS from "aos";
+import "aos/dist/aos.css"; // Import AOS styles
 
 export default function FoodPage() {
   const [foods, setFoods] = useState([]);
@@ -14,18 +16,25 @@ export default function FoodPage() {
   const API_URL = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
 
   useEffect(() => {
+    // Initialize AOS with 'once: false' so animations trigger every time on scroll
+    AOS.init({
+      duration: 1000,
+      once: false, // Trigger animation every time element comes into view
+      offset: 200, // Optional: Adds offset for triggering the animation earlier/later
+    });
+
     const fetchFoods = async () => {
       setLoading(true);
       try {
         const response = await axios.get(API_URL);
-        setFoods(response.data.meals.slice(0, 12));
+        setFoods(response.data.meals.slice(0, 12)); // Fetch all food items once
       } catch (err) {
         setError("Failed to fetch food items. Try again.");
       } finally {
         setLoading(false);
       }
     };
-    fetchFoods();
+    fetchFoods(); // Fetch foods when the component mounts
   }, []);
 
   const toggleLike = (id) => {
@@ -49,12 +58,14 @@ export default function FoodPage() {
         Delicious Dishes
       </div>
 
-      
+      {/* Grid of Food Items */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-        {foods.map((food) => (
+        {foods.map((food, index) => (
           <motion.div
             key={food.idMeal}
             className="relative bg-gray-800 rounded-xl shadow-lg overflow-hidden text-center transform hover:scale-105 transition-transform duration-300"
+            data-aos={index % 2 === 0 ? "fade-up" : "fade-down"} // Different animations for odd/even items
+            data-aos-once="false" // Make sure the animation re-triggers every scroll
           >
             <img
               src={food.strMealThumb}
@@ -95,6 +106,7 @@ export default function FoodPage() {
         ))}
       </div>
 
+      {/* Loading Indicator */}
       {loading && (
         <div className="text-center py-6">
           <motion.div className="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto" />
