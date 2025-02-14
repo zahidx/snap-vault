@@ -2,18 +2,19 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Search, ChevronDown, Menu } from "lucide-react";
-import Sidebar from "./Sidebar";
-import ImageModal from "./ImageModal"; // Import ImageModal component
+import { Download, Search, X, ZoomIn, Menu } from "lucide-react";
+import Sidebar from "../Sidebar"; // Optional: if you still want the sidebar
+import ImageModal from "../ImageModal"; // Import ImageModal.js
 
-export default function HomePage() {
+export default function NaturePage() {
   const [images, setImages] = useState([]);
   const [query, setQuery] = useState("nature");
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [category, setCategory] = useState("nature");
+  // Category is fixed to "nature"
+  const category = "nature";
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const API_KEY = "YOUR_UNSPLASH_ACCESS_KEY"; // Replace with your Unsplash API key
@@ -21,7 +22,7 @@ export default function HomePage() {
   // Fetch images from the API with error handling and retry mechanism
   const fetchImages = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setError(null); // Reset error state on new fetch
     try {
       const response = await axios.get(
         `/api/unsplash?query=${category}&page=${page}&client_id=${API_KEY}`
@@ -35,11 +36,13 @@ export default function HomePage() {
     }
   }, [category, page]);
 
+  // On mount or page change, fetch nature images
   useEffect(() => {
+    // Reset images when the component mounts
     setImages([]);
     setPage(1);
     fetchImages();
-  }, [category, fetchImages]);
+  }, [fetchImages]);
 
   useEffect(() => {
     if (page > 1) fetchImages();
@@ -61,7 +64,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
-      {/* Sidebar Toggle */}
+      {/* Sidebar Toggle (if using sidebar) */}
       <button
         className="p-4 pb-[42px] pt-2 fixed top-0 left-0 z-50 bg-gray-800 text-white dark:bg-gray-900"
         onClick={() => setIsSidebarOpen((prev) => !prev)}
@@ -69,15 +72,14 @@ export default function HomePage() {
         <Menu size={24} />
       </button>
 
-      {/* Sidebar */}
+      {/* Optional Sidebar */}
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
-        setCategory={setCategory}
       />
 
       {/* Main Content */}
-      <div className="flex justify-center items-center py-6 space-x-4">
+      <div className="flex justify-center items-center py-6">
         <motion.div
           className="flex items-center border rounded-lg px-4 py-2 w-80 bg-white dark:bg-gray-800 shadow-lg"
           whileHover={{ scale: 1.05 }}
@@ -89,26 +91,8 @@ export default function HomePage() {
             className="w-full bg-transparent outline-none text-sm"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            disabled // Optionally disable search since we're focusing on nature
           />
-        </motion.div>
-
-        {/* Category Selector */}
-        <motion.div
-          className="relative flex items-center border rounded-lg px-4 py-2 w-40 bg-white dark:bg-gray-800 shadow-lg"
-          whileHover={{ scale: 1.05 }}
-        >
-          <span className="mr-2 text-gray-500">Category:</span>
-          <select
-            className="bg-transparent outline-none text-sm"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option value="nature">Nature</option>
-            <option value="tech">Tech</option>
-            <option value="food">Food</option>
-            <option value="animals">Animals</option>
-          </select>
-          <ChevronDown size={16} className="ml-2 text-gray-500" />
         </motion.div>
       </div>
 
@@ -126,7 +110,7 @@ export default function HomePage() {
             key={img.id}
             className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer"
             whileHover={{ scale: 1.05 }}
-            onClick={() => setSelectedImage(img)}
+            onClick={() => setSelectedImage(img)} // Open ImageModal on click
           >
             <img
               src={img.urls.regular}
@@ -144,12 +128,19 @@ export default function HomePage() {
       {/* Loading Indicator */}
       {loading && (
         <div className="text-center py-6">
-          <motion.div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <motion.div
+            className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"
+          />
         </div>
       )}
 
-      {/* Image Modal */}
-      <ImageModal selectedImage={selectedImage} setSelectedImage={setSelectedImage} />
+      {/* Image Modal (Imported) */}
+      {selectedImage && (
+        <ImageModal
+          selectedImage={selectedImage}
+          setSelectedImage={setSelectedImage} // Pass the state setter
+        />
+      )}
     </div>
   );
 }

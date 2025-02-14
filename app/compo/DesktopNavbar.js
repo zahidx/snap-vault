@@ -1,6 +1,7 @@
 "use client";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown, Sun, Moon, User, Grid, Settings, Lock } from "lucide-react";
+import { Search, ChevronDown, Sun, Moon, User, Grid, Settings } from "lucide-react";
 
 export default function DesktopNavbar({
   darkMode,
@@ -58,18 +59,20 @@ export default function DesktopNavbar({
                 className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-800 border rounded-lg shadow-lg overflow-hidden"
               >
                 {[
-                  { name: "Nature", emoji: "🌿" },
-                  { name: "Architecture", emoji: "🏛️" },
-                  { name: "Technology", emoji: "💻" },
-                  { name: "People", emoji: "👫" },
-                  { name: "Food", emoji: "🍕" },
+                  { name: "Nature", emoji: "🌿", path: "/nature" },
+                  { name: "Architecture", emoji: "🏛️", path: "/architecture" },
+                  { name: "Technology", emoji: "💻", path: "/technology" },
+                  { name: "People", emoji: "👫", path: "/people" },
+                  { name: "Food", emoji: "🍕", path: "/food" },
                 ].map((category, index) => (
                   <motion.li
                     key={index}
-                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all"
                     whileHover={{ scale: 1.05 }}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all"
                   >
-                    {category.emoji} {category.name}
+                    <Link href={category.path} className="flex px-4 py-2">
+                      {category.emoji} {category.name}
+                    </Link>
                   </motion.li>
                 ))}
               </motion.ul>
@@ -110,8 +113,6 @@ export default function DesktopNavbar({
             )}
           </AnimatePresence>
         </div>
-
-       
 
         {/* Dark Mode Toggle */}
         <motion.button
