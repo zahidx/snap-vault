@@ -63,7 +63,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
       {/* Sidebar Toggle */}
       <button
-        className="p-4 fixed top-0 left-0 z-50 bg-gray-800 text-white dark:bg-gray-900"
+        className="p-4 pb-10 mt-2 fixed top-0 left-0 z-50 bg-gray-800 text-white dark:bg-gray-900"
         onClick={() => setIsSidebarOpen((prev) => !prev)}
       >
         <Menu size={24} />
