@@ -2,11 +2,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Search, UserPlus, Eye } from "lucide-react";
+import { UserPlus, Eye } from "lucide-react";
 
 export default function PeoplePage() {
   const [people, setPeople] = useState([]);
-  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -27,6 +26,21 @@ export default function PeoplePage() {
     fetchPeople();
   }, []);
 
+  // Navigate to ProfilePage
+  const navigateToProfile = (id) => {
+    window.location.href = `/ProfilePage?uuid=${id}`;
+  };
+
+  // Handle Follow/Unfollow
+  const [followed, setFollowed] = useState({});
+
+  const handleFollow = (id) => {
+    setFollowed((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id], // Toggle follow state
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Hero Section */}
@@ -34,8 +48,6 @@ export default function PeoplePage() {
         style={{ backgroundImage: "url('/path-to-people-banner.jpg')" }}>
         Meet Our Community
       </div>
-
-      
 
       {/* Grid Layout for People Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
@@ -56,12 +68,19 @@ export default function PeoplePage() {
 
             <div className="mt-4 flex justify-center gap-4">
               <motion.button
-                className="bg-blue-500 px-4 py-2 rounded-full text-sm flex items-center gap-2 hover:bg-blue-600 transition"
+                className={`px-4 py-2 rounded-full text-sm flex items-center gap-2 transition-all ${
+                  followed[person.login.uuid]
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-blue-500 hover:bg-blue-600"
+                }`}
+                onClick={() => handleFollow(person.login.uuid)}
               >
-                <UserPlus size={16} /> Follow
+                <UserPlus size={16} /> 
+                {followed[person.login.uuid] ? "Following" : "Follow"}
               </motion.button>
               <motion.button
                 className="bg-gray-700 px-4 py-2 rounded-full text-sm flex items-center gap-2 hover:bg-gray-600 transition"
+                onClick={() => navigateToProfile(person.login.uuid)} // Navigate to profile on button click
               >
                 <Eye size={16} /> View Profile
               </motion.button>
@@ -76,6 +95,13 @@ export default function PeoplePage() {
           <motion.div
             className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"
           />
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="text-center text-red-500 py-6">
+          {error}
         </div>
       )}
     </div>

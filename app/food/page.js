@@ -43,29 +43,13 @@ export default function FoodPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div
-        className="relative w-full h-[300px] flex items-center justify-center bg-cover bg-center text-white text-4xl font-bold"
+        className="relative w-full h-[100px] mt-20 flex items-center justify-center bg-cover bg-center text-white text-4xl font-bold"
         style={{ backgroundImage: "url('/path-to-food-banner.jpg')" }}
       >
         Delicious Dishes
       </div>
 
-      <div className="flex justify-center mt-6">
-        <motion.div
-          className="flex items-center border border-gray-700 rounded-full px-4 py-2 w-80 bg-gray-800 shadow-lg"
-          whileHover={{ scale: 1.05 }}
-        >
-          <Search className="mr-2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search food..."
-            className="w-full bg-transparent outline-none text-sm text-white"
-            disabled
-          />
-        </motion.div>
-      </div>
-
-      {error && <div className="text-center text-red-500 py-4">{error}</div>}
-
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
         {foods.map((food) => (
           <motion.div

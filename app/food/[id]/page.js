@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react"; // Lucide icon for back button
 import { motion } from "framer-motion";
+import { Facebook, Twitter } from "lucide-react"; // Lucide icons for social media
+import { FaPinterestP } from "react-icons/fa"; // React icon for Pinterest
 
 export default function RecipePage() {
   const { id } = useParams();
@@ -32,15 +34,6 @@ export default function RecipePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#0E1628] to-[#380643] text-white p-10">
-      {/* Back Button */}
-      <motion.button
-        className="flex items-center gap-2 text-gray-300 hover:text-white mb-12 text-lg font-semibold transition-all duration-300 ease-in-out transform hover:scale-105"
-        onClick={() => router.push("/food")}
-        whileHover={{ scale: 1.1, rotate: -8 }}
-      >
-        <ArrowLeft size={24} /> Back
-      </motion.button>
-
       {/* Loader */}
       {loading ? (
         <div className="text-center py-12">
@@ -92,13 +85,9 @@ export default function RecipePage() {
                   }))
                   .filter((item) => item.ingredient)
                   .map((item, index) => (
-                    <motion.li
-                      key={index}
-                      className="transition-all duration-300 text-lg hover:text-indigo-500"
-                      whileHover={{ scale: 1.05 }}
-                    >
+                    <li key={index} className="text-lg">
                       <span className="font-medium">{item.ingredient}</span> - {item.measure}
-                    </motion.li>
+                    </li>
                   ))}
               </ul>
             </div>
@@ -115,44 +104,49 @@ export default function RecipePage() {
               </motion.h3>
               <ol className="text-lg text-gray-300 space-y-4 mt-4">
                 {instructionsSteps?.map((step, index) => (
-                  <motion.li
-                    key={index}
-                    className="transition-all duration-300 hover:text-indigo-500"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {step}
-                  </motion.li>
+                  <li key={index}>{step}</li>
                 ))}
               </ol>
             </div>
+          </div>
 
-            {/* Social Sharing */}
-            <div className="flex space-x-6 mt-8 justify-center">
+          {/* Social Sharing and Back Button */}
+          <div className="flex justify-between items-center mt-8 px-10 pb-10">
+            {/* Social Media Icons */}
+            <div className="flex space-x-6">
               <motion.a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`}
                 target="_blank"
-                className="text-white hover:text-blue-600 transition-all duration-300 text-lg"
-                whileHover={{ scale: 1.05 }}
+                className="text-white text-xl"
+                whileHover={{ scale: 1.1 }}
               >
-                Facebook
+                <Facebook size={35} />
               </motion.a>
               <motion.a
                 href={`https://twitter.com/intent/tweet?url=${window.location.href}`}
                 target="_blank"
-                className="text-white hover:text-blue-400 transition-all duration-300 text-lg"
-                whileHover={{ scale: 1.05 }}
+                className="text-white text-xl"
+                whileHover={{ scale: 1.1 }}
               >
-                Twitter
+                <Twitter size={35} />
               </motion.a>
               <motion.a
                 href={`https://www.pinterest.com/pin/create/button/?url=${window.location.href}`}
                 target="_blank"
-                className="text-white hover:text-red-600 transition-all duration-300 text-lg"
-                whileHover={{ scale: 1.05 }}
+                className="text-white text-xl"
+                whileHover={{ scale: 1.1 }}
               >
-                Pinterest
+                <FaPinterestP size={35} /> {/* Pinterest icon from react-icons */}
               </motion.a>
             </div>
+
+            {/* Back Button */}
+            <motion.button
+              className="flex items-center gap-2 text-gray-300 text-lg font-semibold transition-all duration-300 ease-in-out"
+              onClick={() => router.push("/food")}
+            >
+              <ArrowLeft size={24} className="text-white" /> Back
+            </motion.button>
           </div>
         </div>
       ) : (
