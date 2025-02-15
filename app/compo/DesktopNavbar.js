@@ -54,13 +54,15 @@ export default function DesktopNavbar({
   return (
     <div className="hidden md:flex max-w-7xl mx-auto px-6 py-4 justify-between items-center bg-gray-900 text-white">
       {/* Logo */}
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-extrabold cursor-pointer text-gray-100"
-      >
-        SnapVault
-      </motion.h1>
+<Link href="/">
+  <motion.h1
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-4xl font-extrabold cursor-pointer text-gray-100"
+  >
+    SnapVault
+  </motion.h1>
+</Link>
 
       {/* Search Bar */}
       <motion.div
