@@ -5,7 +5,7 @@ import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce"; // For debouncing
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
   const [images, setImages] = useState([]);
@@ -73,48 +73,54 @@ export default function SearchPage() {
   }, [loading, isEnd]);
 
   return (
-    <Suspense fallback={<div>Loading search results...</div>}>
-      <div className="max-w-7xl mx-auto px-6 py-10">
-        <h1 className="text-3xl font-bold text-white">
-          Search Results for "{query}"
-        </h1>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-3xl font-bold text-white">
+        Search Results for "{query}"
+      </h1>
 
-        {loading && !images.length ? (
-          <div className="animate-pulse space-y-4">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="h-64 bg-gray-300 rounded-lg" />
-            ))}
-          </div>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : images.length === 0 ? (
-          <p className="text-gray-400">No results found for "{query}".</p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-            {images.map((image) => (
-              <div
-                key={image.id}
-                className="rounded-lg overflow-hidden shadow-lg"
-                data-aos="zoom-in"
-                data-aos-duration="1200"
-              >
-                <img
-                  src={image.urls.small}
-                  alt={image.alt_description || "Image"}
-                  className="w-full h-52 object-cover"
-                  loading="lazy" // Lazy loading for images
-                />
-                <p className="text-center text-gray-300 mt-2">
-                  {image.description || "Untitled"}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
+      {loading && !images.length ? (
+        <div className="animate-pulse space-y-4">
+          {[...Array(6)].map((_, index) => (
+            <div key={index} className="h-64 bg-gray-300 rounded-lg" />
+          ))}
+        </div>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : images.length === 0 ? (
+        <p className="text-gray-400">No results found for "{query}".</p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+          {images.map((image) => (
+            <div
+              key={image.id}
+              className="rounded-lg overflow-hidden shadow-lg"
+              data-aos="zoom-in"
+              data-aos-duration="1200"
+            >
+              <img
+                src={image.urls.small}
+                alt={image.alt_description || "Image"}
+                className="w-full h-52 object-cover"
+                loading="lazy" // Lazy loading for images
+              />
+              <p className="text-center text-gray-300 mt-2">
+                {image.description || "Untitled"}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
-        {loading && <p className="text-center text-gray-500">Loading more...</p>}
-        {isEnd && <p className="text-center text-gray-500">No more results.</p>}
-      </div>
+      {loading && <p className="text-center text-gray-500">Loading more...</p>}
+      {isEnd && <p className="text-center text-gray-500">No more results.</p>}
+    </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
     </Suspense>
   );
 }
