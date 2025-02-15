@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -30,14 +31,15 @@ export default function DesktopNavbar({
 
   const clearSearch = () => {
     setSearchQuery(""); // Clear search input
-    router.push("/"); // Navigate to the homepage when search is cleared
+    // Redirect to homepage only if the query is empty
+    if (searchQuery.trim() === "") {
+      router.push("/"); // Navigate to the homepage when search is cleared
+    }
   };
 
   // Update URL based on the search query change
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      router.push("/"); // Redirect to home page if search query is empty
-    } else {
+    if (searchQuery.trim() !== "") {
       router.push(`/search?query=${encodeURIComponent(searchQuery)}`); // Navigate to search results if query exists
     }
   }, [searchQuery, router]);
