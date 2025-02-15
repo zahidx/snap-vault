@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { auth } from "../compo/firebase"; // Make sure this path is correct
 
-export default function SignupPage({ closeModal }) {
+export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -45,8 +45,8 @@ export default function SignupPage({ closeModal }) {
   };
 
   return (
-    <div className="fixed inset-0 pt-[355px] bg-black bg-opacity-70 z-50 flex items-center justify-center backdrop-blur-sm" onClick={closeModal}>
-      <div className="bg-gray-800 p-8 rounded-lg w-full max-w-md mx-4 sm:mx-auto relative z-60 shadow-lg" onClick={(e) => e.stopPropagation()}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-8">
+      <div className="bg-gray-800 p-8 rounded-lg w-full max-w-md mx-4 sm:mx-auto shadow-lg">
         <h2 className="text-3xl font-semibold mb-6 text-center text-white">Sign Up</h2>
         {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
         <form onSubmit={handleSubmit}>
@@ -90,11 +90,6 @@ export default function SignupPage({ closeModal }) {
             )}
           </button>
         </form>
-        <div className="text-center mt-4">
-          <button onClick={closeModal} className="text-blue-500 hover:text-blue-400 text-sm">
-            Close
-          </button>
-        </div>
       </div>
     </div>
   );
