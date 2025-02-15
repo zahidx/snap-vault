@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, Sun, Moon, User, Grid, Settings } from "lucide-react";
+import LoginModal from "./LoginModal"; // Import the LoginModal component
 
 export default function DesktopNavbar({
   darkMode,
@@ -18,6 +19,7 @@ export default function DesktopNavbar({
 }) {
   const router = useRouter(); // Initialize router
   const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for managing modal visibility
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -39,6 +41,11 @@ export default function DesktopNavbar({
       router.push(`/search?query=${encodeURIComponent(searchQuery)}`); // Navigate to search results if query exists
     }
   }, [searchQuery, router]);
+
+  // Function to toggle the modal visibility
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+  };
 
   return (
     <div className="hidden md:flex max-w-7xl mx-auto px-6 py-4 justify-between items-center bg-gray-900 text-white">
@@ -66,15 +73,14 @@ export default function DesktopNavbar({
           className="w-full bg-transparent outline-none text-sm text-gray-300"
         />
         {searchQuery && (
-  <button
-    type="button"
-    onClick={clearSearch} // Clear search on button click
-    className="ml-2 text-2xl text-gray-400 hover:text-gray-200"
-  >
-    ✕
-  </button>
-)}
-
+          <button
+            type="button"
+            onClick={clearSearch} // Clear search on button click
+            className="ml-2 text-2xl text-gray-400 hover:text-gray-200"
+          >
+            ✕
+          </button>
+        )}
       </motion.form>
 
       {/* Right Section */}
@@ -162,13 +168,19 @@ export default function DesktopNavbar({
 
         {/* Profile / Login */}
         <motion.button
-          className="flex items-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 hover:bg-gray-700 transition-all duration-200"
+          className="flex items-center text-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 hover:bg-gray-700 transition-all duration-200"
           whileHover={{ scale: 1.05 }}
+          onClick={toggleModal} // Toggle modal visibility on click
         >
           <User size={20} />
           <span>Sign In</span>
         </motion.button>
       </div>
+
+      {/* Conditionally render the LoginModal */}
+      <AnimatePresence>
+        {isModalOpen && <LoginModal closeModal={toggleModal} />}
+      </AnimatePresence>
     </div>
   );
 }
