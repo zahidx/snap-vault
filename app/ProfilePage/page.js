@@ -5,27 +5,32 @@ export default function ProfilePage() {
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Extract the `uuid` from the URL query string
-  const queryParams = new URLSearchParams(window.location.search);
-  const uuid = queryParams.get("uuid");
+  const [uuid, setUuid] = useState(null);
 
   useEffect(() => {
-    const fetchPerson = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`https://randomuser.me/api/?results=1&uuid=${uuid}`);
-        const data = await response.json();
-        setPerson(data.results[0]); // Adjust based on the API response
-      } catch (err) {
-        setError("Failed to fetch profile details.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // This will run only on the client side
+    if (typeof window !== "undefined") {
+      const queryParams = new URLSearchParams(window.location.search);
+      setUuid(queryParams.get("uuid"));
+    }
+  }, []);
 
+  useEffect(() => {
     if (uuid) {
+      const fetchPerson = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch(`https://randomuser.me/api/?results=1&uuid=${uuid}`);
+          const data = await response.json();
+          setPerson(data.results[0]); // Adjust based on the API response
+        } catch (err) {
+          setError("Failed to fetch profile details.");
+        } finally {
+          setLoading(false);
+        }
+      };
+
       fetchPerson();
     }
   }, [uuid]);
