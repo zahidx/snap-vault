@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown, Sun, Moon, User, Grid, Settings } from "lucide-react";
@@ -14,30 +14,41 @@ export default function DesktopNavbar({
   toggleCategories,
   settingsOpen,
   toggleSettings,
-  categoryRef = null, // Default to null in case it's not passed
+  categoryRef = null,
 }) {
-  const router = useRouter(); // Initialize router
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for managing modal visibility
+  const router = useRouter();
+  const pathname = usePathname(); // Get the current page path
+  const lastRoute = useRef(pathname); // Store last visited route
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim() !== "") {
-      router.push(`/search?query=${encodeURIComponent(searchQuery)}`); // Navigate with search query
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Update last visited route before performing a search
+  useEffect(() => {
+    if (!searchQuery) {
+      lastRoute.current = pathname;
     }
-  };
+  }, [pathname, searchQuery]);
+
+  // Debounce search input for better performance
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (debouncedQuery.trim() !== "") {
+      router.push(`/search?query=${encodeURIComponent(debouncedQuery)}`);
+    }
+  }, [debouncedQuery, router]);
 
   const clearSearch = () => {
-    setSearchQuery(""); // Clear search input
-    // Redirect to homepage only if the query is empty
-    if (searchQuery.trim() === "") {
-      router.push("/"); // Navigate to the homepage when search is cleared
-    }
-  };
-
-  // Function to toggle the modal visibility
-  const toggleModal = () => {
-    setIsModalOpen((prev) => !prev);
+    setSearchQuery("");
+    router.push(lastRoute.current); // Redirect to previous page instead of home
   };
 
   return (
@@ -48,12 +59,11 @@ export default function DesktopNavbar({
         animate={{ opacity: 1, y: 0 }}
         className="text-4xl font-extrabold cursor-pointer text-gray-100"
       >
-        PhotoGallery
+        SnapVault
       </motion.h1>
 
       {/* Search Bar */}
-      <motion.form
-        onSubmit={handleSearch} // Handle search submission
+      <motion.div
         className="hidden md:flex items-center bg-gray-800 border rounded-xl px-4 py-2 w-80 shadow-lg transition-all duration-300"
         whileHover={{ scale: 1.05 }}
       >
@@ -62,20 +72,20 @@ export default function DesktopNavbar({
           type="text"
           placeholder="Search images..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} // Update state
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full bg-transparent outline-none text-sm text-gray-300"
         />
         {searchQuery && (
           <button
             type="button"
-            onClick={clearSearch} // Clear search on button click
+            onClick={clearSearch}
             className="ml-2 text-2xl text-gray-400 hover:text-gray-200"
             aria-label="Clear search"
           >
             ✕
           </button>
         )}
-      </motion.form>
+      </motion.div>
 
       {/* Right Section */}
       <div className="flex items-center space-x-8">
@@ -153,21 +163,11 @@ export default function DesktopNavbar({
           </AnimatePresence>
         </div>
 
-        {/* Dark Mode Toggle */}
-        <motion.button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-lg transition-all duration-200 hover:bg-gray-700"
-          whileTap={{ scale: 0.9 }}
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? <Sun size={22} className="text-yellow-500" /> : <Moon size={22} className="text-gray-400" />}
-        </motion.button>
-
         {/* Profile / Login */}
         <motion.button
           className="flex items-center text-center space-x-2 px-4 py-2 border rounded-lg text-gray-300 hover:bg-gray-700 transition-all duration-200"
           whileHover={{ scale: 1.05 }}
-          onClick={toggleModal} // Toggle modal visibility on click
+          onClick={() => setIsModalOpen((prev) => !prev)}
           aria-label="Open login modal"
         >
           <User size={20} />
@@ -177,7 +177,7 @@ export default function DesktopNavbar({
 
       {/* Conditionally render the LoginModal */}
       <AnimatePresence>
-        {isModalOpen && <LoginModal closeModal={toggleModal} />}
+        {isModalOpen && <LoginModal closeModal={() => setIsModalOpen(false)} />}
       </AnimatePresence>
     </div>
   );

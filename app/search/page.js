@@ -87,7 +87,7 @@ function SearchPageContent() {
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : images.length === 0 ? (
-        <p className="text-gray-400">No results found for "{query}".</p>
+        <p className="text-gray-400"> "{query}".</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
           {images.map((image) => (
